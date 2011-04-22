@@ -22,7 +22,6 @@ function(user.name, device.name) {
     # Create a function that checks if the Info.plist file is the correct one.
     is.device<-function(path, device) {
       # just to make sure, convert any nasty apostrophes from the device name
-      device = gsub("’","'",device)
         device.xml<-tryCatch(
           suppressMessages(
             xmlTreeParse(paste(path,"/Info.plist",sep=""), useInternalNodes=TRUE)
@@ -34,7 +33,7 @@ function(user.name, device.name) {
             path.values<-sapply(path.strings, xmlValue)
             # protect user from posh apostrophes
             test_device = gsub("’","'",path.values[2])
-            return(ifelse(test_device==device, TRUE, FALSE))
+            return(ifelse(test_device==gsub("’","'",device), TRUE, FALSE))
         }
         else {
             return(FALSE)
