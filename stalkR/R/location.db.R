@@ -1,3 +1,9 @@
+list.dirs <- function(path=".", pattern=NULL, all.dirs=FALSE, full.names=FALSE, ignore.case=FALSE) {
+  all <- list.files(path, pattern, all.dirs,
+  full.names, recursive=FALSE, ignore.case)
+  all[file.info(all)$isdir]
+}
+
 location.db<-
 function(user.name, device.name) {
     # Locate mobile sync data files that were modified most recently and contain data on 
