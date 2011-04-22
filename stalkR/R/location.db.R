@@ -1,6 +1,5 @@
-list.dirs <- function(path=".", pattern=NULL, all.dirs=FALSE, full.names=FALSE, ignore.case=FALSE) {
-  all <- list.files(path, pattern, all.dirs,
-  full.names, recursive=FALSE, ignore.case)
+list.dirs <- function(path=".", pattern=NULL, all.dirs=FALSE, ignore.case=FALSE) {
+  all <- list.files(path, pattern, all.dirs, full.names=TRUE, recursive=FALSE, ignore.case)
   all[file.info(all)$isdir]
 }
 
@@ -22,12 +21,20 @@ function(user.name, device.name) {
 
     # Create a function that checks if the Info.plist file is the correct one.
     is.device<-function(path, device) {
-        device.xml<-tryCatch(suppressMessages(xmlTreeParse(paste(path,"/Info.plist",sep=""), useInternalNodes=TRUE)), 
-            error=function(e) return(FALSE))
+      # just to make sure, convert any nasty apostrophes from the device name
+      device = gsub("’","'",device)
+        device.xml<-tryCatch(
+          suppressMessages(
+            xmlTreeParse(paste(path,"/Info.plist",sep=""), useInternalNodes=TRUE)
+          ), 
+          error=function(e) return(FALSE)
+        )
         if(length(class(device.xml))>1) {
             path.strings<-getNodeSet(device.xml, "//dict/string")
             path.values<-sapply(path.strings, xmlValue)
-            return(ifelse(path.values[2]==device, TRUE, FALSE))
+            # protect user from posh apostrophes
+            test_device = gsub("’","'",path.values[2])
+            return(ifelse(test_device==device, TRUE, FALSE))
         }
         else {
             return(FALSE)
